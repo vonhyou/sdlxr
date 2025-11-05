@@ -9,7 +9,7 @@ This is a port of [SDL](https://libsdl.org/) to the Zig build system, packaged f
 
 ## Usage
 
-Requires Zig 0.15.1 or 0.16.0-dev (master).
+Requires Zig 0.15.2 or 0.16.0-dev (master).
 
 ```sh
 zig fetch --save git+https://github.com/castholm/SDL.git
@@ -41,26 +41,26 @@ Example projects using this SDL package:
 
 ## Supported targets
 
-First-class targets (fully supported):
-
-Target \\ Host|Windows|Linux|macOS
--|:-:|:-:|:-:
-`x86_64-windows-gnu`|✅|✅|✅
-`x86_64-linux-gnu`|✅|✅|✅
-`aarch64-macos-none`|❌|❌|🉑
-`wasm32-emscripten-musl`|🉑|🉑|🉑
-
-Second-class targets (will likely work, but not as actively tested):
-
-Target \\ Host|Windows|Linux|macOS
--|:-:|:-:|:-:
-`aarch64-windows-gnu`|✅|✅|✅
-`x86_64-windows-msvc`|🉑|❌|❌
-`aarch64-windows-msvc`|🉑|❌|❌
-`x86_64-macos-none`|❌|❌|🉑
-`aarch64-linux-gnu`|✅|✅|✅
-`x86_64-linux-musl`|✅|✅|✅
-`aarch64-linux-musl`|✅|✅|✅
+<table>
+<thead>
+<tr><th rowspan=2 align=center valign=center>Target<th colspan=3 align=center>Host
+<tr><th align=center>Windows<th align=center>Linux<th align=center>macOS
+<tbody>
+<tr><th colspan=4 align=left>First-class targets (fully supported)
+<tr><td><code>x86-64-windows-gnu</code><td align=center>✅<td align=center>✅<td align=center>✅
+<tr><td><code>x86-64-linux-gnu</code><td align=center>✅<td align=center>✅<td align=center>✅
+<tr><td><code>aarch64-macos-none</code><td align=center>❌<td align=center>❌<td align=center>🉑
+<tr><td><code>wasm32-emscripten-musl</code><td align=center>🉑<td align=center>🉑<td align=center>🉑
+<tbody>
+<tr><th colspan=4 align=left>Second-class targets (not as thorougly tested)
+<tr><td><code>aarch64-windows-gnu</code><td align=center>✅<td align=center>✅<td align=center>✅
+<tr><td><code>x86_64-windows-msvc</code><td align=center>🉑<td align=center>❌<td align=center>❌
+<tr><td><code>aarch64-windows-msvc</code><td align=center>🉑<td align=center>❌<td align=center>❌
+<tr><td><code>aarch64-linux-gnu</code><td align=center>✅<td align=center>✅<td align=center>✅
+<tr><td><code>x86-64-linux-musl</code><td align=center>✅<td align=center>✅<td align=center>✅
+<tr><td><code>aarch64-linux-musl</code><td align=center>✅<td align=center>✅<td align=center>✅
+<tr><td><code>x86_64-macos-none</code><td align=center>❌<td align=center>❌<td align=center>🉑
+</table>
 
 Legend:
 

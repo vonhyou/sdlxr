@@ -131,7 +131,7 @@ To build with [pthreads support](https://emscripten.org/docs/porting/pthreads.ht
 This repository is [REUSE-compliant](https://reuse.software/). The effective SPDX license expression for the repository as a whole is:
 
 ```
-(BSD-3-Clause OR GPL-3.0 OR HIDAPI) AND Apache-2.0 AND BSD-3-Clause AND CC0-1.0 AND HIDAPI AND HPND-sell-variant AND MIT AND SunPro AND Zlib
+(BSD-3-Clause OR GPL-3.0 OR HIDAPI) AND Apache-2.0 AND BSD-3-Clause AND CC0-1.0 AND HIDAPI AND HPND-sell-variant AND MIT AND SunPro AND Unlicense AND Zlib
 ```
 
 (This is identical to the upstream SDL repository, just expressed in more explicit terms.)

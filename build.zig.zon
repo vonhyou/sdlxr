@@ -8,7 +8,7 @@
     .minimum_zig_version = "0.15.2",
     .dependencies = .{
         .sdl_linux_deps = .{
-            .url = "git+https://github.com/castholm/SDL_linux_deps.git#b579da12aac27a5269b28dd425b05791ea835bdf",
+            .url = "git+https://github.com/castholm/SDL_linux_deps.git#fd349940b9dbaa0f221703b05df826d745d7ce2a",
             .hash = "sdl_linux_deps-0.0.0-SDL_ltg8hgAOayMwFN6BhHW3Rs5UPtf6n8m-2qcQHuGS",
             .lazy = true,
         },

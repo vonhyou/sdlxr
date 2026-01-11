@@ -25,7 +25,6 @@ const sdl_dep = b.dependency("sdl", .{
     //.pic = null,
     //.lto = null,
     //.emscripten_pthreads = false,
-    //.install_build_config_h = false,
 });
 const sdl_lib = sdl_dep.artifact("SDL3");
 const sdl_test_lib = sdl_dep.artifact("SDL3_test");
@@ -46,18 +45,18 @@ Example projects using this SDL package:
 <tr><th rowspan=2 align=center valign=center>Target<th colspan=3 align=center>Host
 <tr><th align=center>Windows<th align=center>Linux<th align=center>macOS
 <tbody>
-<tr><th colspan=4 align=left>First-class targets (fully supported)
-<tr><td><code>x86-64-windows-gnu</code><td align=center>✅<td align=center>✅<td align=center>✅
-<tr><td><code>x86-64-linux-gnu</code><td align=center>✅<td align=center>✅<td align=center>✅
+<tr><th colspan=4 align=left>First-class targets
+<tr><td><code>x86_64-windows-gnu</code><td align=center>✅<td align=center>✅<td align=center>✅
+<tr><td><code>x86_64-linux-gnu</code><td align=center>✅<td align=center>✅<td align=center>✅
 <tr><td><code>aarch64-macos-none</code><td align=center>❌<td align=center>❌<td align=center>🉑
 <tr><td><code>wasm32-emscripten-musl</code><td align=center>🉑<td align=center>🉑<td align=center>🉑
 <tbody>
-<tr><th colspan=4 align=left>Second-class targets (not quite as thoroughly tested)
-<tr><td><code>aarch64-windows-gnu</code><td align=center>✅<td align=center>✅<td align=center>✅
+<tr><th colspan=4 align=left>Second-class targets (experimental)
 <tr><td><code>x86_64-windows-msvc</code><td align=center>🉑<td align=center>❌<td align=center>❌
+<tr><td><code>aarch64-windows-gnu</code><td align=center>✅<td align=center>✅<td align=center>✅
 <tr><td><code>aarch64-windows-msvc</code><td align=center>🉑<td align=center>❌<td align=center>❌
+<tr><td><code>x86_64-linux-musl</code><td align=center>✅<td align=center>✅<td align=center>✅
 <tr><td><code>aarch64-linux-gnu</code><td align=center>✅<td align=center>✅<td align=center>✅
-<tr><td><code>x86-64-linux-musl</code><td align=center>✅<td align=center>✅<td align=center>✅
 <tr><td><code>aarch64-linux-musl</code><td align=center>✅<td align=center>✅<td align=center>✅
 <tr><td><code>x86_64-macos-none</code><td align=center>❌<td align=center>❌<td align=center>🉑
 </table>
@@ -89,37 +88,34 @@ The [SDL_linux_deps](https://github.com/castholm/SDL_linux_deps) package provide
 Building for `aarch64/x86_64-macos` requires Xcode 14.1 or later to be installed on the host macOS system.
 
 > [!NOTE]
-> **Cross-compiling for macOS from Windows or Linux host systems is not supported** because [the Xcode and Apple SDKs Agreement](https://www.apple.com/legal/sla/docs/xcode.pdf) explicitly prohibits using macOS SDK files from non-Apple-branded computers or devices.
+> **Cross-compiling for macOS from Windows or Linux host systems is not supported** because [the Xcode and Apple SDKs Agreement](https://www.apple.com/legal/sla/docs/xcode.pdf) explicitly prohibits using macOS SDK files from non-Apple-branded systems.
 
 When building for non-native macOS targets (for example for x86-64 from an AArch64 Mac), you need to provide a path to the macOS SDK sysroot via `--sysroot`:
 
 ```sh
-sysroot_path=$(xcrun --sdk macosx --show-sdk-path)
-zig build -Dtarget=x86_64-macos --sysroot "$sysroot_path"
+zig build -Dtarget=x86_64-macos --sysroot "$(xcrun --sdk macosx --show-sdk-path)"
 ```
 
 ### Emscripten (web)
 
 > [!IMPORTANT]
-> Before you continue, please understand that **Emscripten is an advanced target** and that **building an SDL app for the Web is significantly more complicated compared to Windows, Linux or macOS**:
+> Before you proceed, please understand that **Emscripten is an advanced target** and that **building an SDL app for the Web requires significantly more effort compared to Windows, Linux or macOS**:
 >
-> - You will need to compile your app into a static library instead of an executable.
+> - You will need to compile your app into an object file or a static library instead of an executable.
 > - If you use libc headers (e.g. by translating C code to Zig), you will need to add the `include` directory inside the Emscripten sysroot to your header search paths.
 > - To build the final HTML/JS/Wasm artifacts, you will need to invoke `emcc` using run steps.
-> - You will likely need to do a lot of your own research and try out different combinations of `emcc` options to get satisfactory results. Make sure you read [the official Emscripten documentation](https://emscripten.org/docs/index.html) as well as [SDL's README on Emscripten](https://wiki.libsdl.org/SDL3/README/emscripten).
+> - You will likely need to do a lot of your own research and try out different combinations of `emcc` options to get satisfactory results. Make sure you read [the official Emscripten documentation](https://emscripten.org/docs/index.html) as well as [SDL's Emscripten README](https://wiki.libsdl.org/SDL3/README/emscripten).
 >
-> In addition, note that Emscripten 4.0.4 or later will provide its own official port of SDL3 if you pass `--use-port=sdl3` to `emcc`. Depending on your use case, **you might not even need this package at all**.
+> In addition, note that Emscripten 4.0.4 or later will provide its own official port of SDL3 if you pass `-sUSE_SDL=3` to `emcc`. Depending on your use case **you might not even need this package at all**.
 >
 > Refer to [the example projects](#examples) for examples on how to set up your `build.zig` for building for the Web.
 
-Building for `wasm32-emscripten` requires an Emscripten development environment to be set up on the host system. It is strongly recommended that you use [the Emscripten SDK](https://emscripten.org/docs/getting_started/downloads.html) to install and manage Emscripten.
+Building for `wasm32-emscripten` requires an Emscripten development environment to be set up on the host system. It is strongly recommended that you use [the Emscripten SDK](https://emscripten.org/docs/getting_started/downloads.html) for installing and managing Emscripten.
 
 When building for Emscripten, you need to provide a path to the Emscripten sysroot via `--sysroot`:
 
 ```sh
-cache_path=$(em-config CACHE)
-sysroot_path="$cache_path/sysroot"
-zig build -Dtarget=wasm32-emscripten --sysroot "$sysroot_path"
+zig build -Dtarget=wasm32-emscripten --sysroot "$(em-config CACHE)/sysroot"
 ```
 
 Depending on the state of your Emscripten cache, you might need to run `embuilder build sysroot` to ensure that the Emscripten sysroot is built before you run `zig build`.
@@ -127,6 +123,8 @@ Depending on the state of your Emscripten cache, you might need to run `embuilde
 To build with [pthreads support](https://emscripten.org/docs/porting/pthreads.html), specify `.emscripten_pthreads = true`.
 
 ## License
+
+[![REUSE status](https://api.reuse.software/badge/github.com/castholm/SDL)](https://api.reuse.software/info/github.com/castholm/SDL)
 
 This repository is [REUSE-compliant](https://reuse.software/). The effective SPDX license expression for the repository as a whole is:
 

@@ -47,6 +47,11 @@ pub fn build(b: *std.Build) void {
         "emscripten_pthreads",
         "Build with pthreads support when targeting Emscripten (default: false)",
     ) orelse false;
+    const build_config_overrides = b.option(
+        []const []const u8,
+        "build_config_h_overrides",
+        "Override 'SDL_build_config.h' entries (e.g. '-DHAVE_SIN=1', '-UHAVE_COS')",
+    );
     const install_build_config_h = b.option(
         bool,
         "install_build_config_h",
@@ -573,6 +578,20 @@ pub fn build(b: *std.Build) void {
             .SDL_DISABLE_LASX = !(loongarch and std.Target.loongarch.featureSetHas(cpu.features, .lasx)),
             .SDL_DISABLE_NEON = !(arm and std.Target.arm.featureSetHas(cpu.features, .neon) or aarch64 and std.Target.aarch64.featureSetHas(cpu.features, .neon)),
         });
+    };
+
+    if (build_config_overrides) |overrides| for (overrides) |override| {
+        if (std.mem.startsWith(u8, override, "-D")) {
+            // TODO: Change to std.mem.cut after 0.16
+            var it = std.mem.splitScalar(u8, override[2..], '=');
+            const name, const value = .{ it.first(), if (it.peek() != null) it.rest() else "1" };
+            build_config_h.values.put(name, .{ .ident = value }) catch @panic("OOM");
+        } else if (std.mem.startsWith(u8, override, "-U")) {
+            _ = build_config_h.values.swapRemove(override[2..]);
+        } else {
+            std.log.err("expected 'SDL_build_config.h' entry override in the form '-D<name>[=<value>]' or '-U<name>', found '{s}'", .{override});
+            std.process.exit(1);
+        }
     };
 
     const revision_h = b.addConfigHeader(.{

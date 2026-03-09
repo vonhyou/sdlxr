@@ -47,7 +47,7 @@ pub fn build(b: *std.Build) void {
         "emscripten_pthreads",
         "Build with pthreads support when targeting Emscripten (default: false)",
     ) orelse false;
-    const build_config_overrides = b.option(
+    const build_config_h_overrides = b.option(
         []const []const u8,
         "build_config_h_overrides",
         "Override 'SDL_build_config.h' entries (e.g. '-DHAVE_SIN=1', '-UHAVE_COS')",
@@ -580,7 +580,7 @@ pub fn build(b: *std.Build) void {
         });
     };
 
-    if (build_config_overrides) |overrides| for (overrides) |override| {
+    if (build_config_h_overrides) |overrides| for (overrides) |override| {
         if (std.mem.startsWith(u8, override, "-D")) {
             // TODO: Change to std.mem.cut after 0.16
             var it = std.mem.splitScalar(u8, override[2..], '=');
@@ -649,7 +649,7 @@ pub fn build(b: *std.Build) void {
         sdl_mod.addCMacro("_CRT_SECURE_NO_DEPRECATE", "1");
         sdl_mod.addCMacro("_CRT_NONSTDC_NO_DEPRECATE", "1");
         sdl_mod.addCMacro("_CRT_SECURE_NO_WARNINGS", "1");
-        if (@import("builtin").zig_version.major <= 15) {
+        if (@import("builtin").zig_version.major <= 15) { // TODO: Remove after 0.16
             // Fix "duplicate symbol" errors by redefining a problematic weak symbol definition in
             // wchar.h which was introduced in Windows SDK version 10.0.26100.0 and which LLVM 20
             // doesn't understand how to handle.

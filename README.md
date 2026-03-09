@@ -122,6 +122,10 @@ Depending on the state of your Emscripten cache, you might need to run `embuilde
 
 To build with [pthreads support](https://emscripten.org/docs/porting/pthreads.html), specify `.emscripten_pthreads = true`.
 
+## Contributing
+
+Due to maintainers having limited time to test and verify that external contributions meet the appropriate quality standards, **pull requests have been disabled for this repository**. If you encounter a problem with the package, or have suggestions for improvements, please open an issue.
+
 ## License
 
 [![REUSE status](https://api.reuse.software/badge/github.com/castholm/SDL)](https://api.reuse.software/info/github.com/castholm/SDL)

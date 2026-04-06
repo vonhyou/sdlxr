@@ -569,6 +569,7 @@ pub fn build(b: *std.Build) void {
             .SDL_VIDEO_VITA_PIB = false,
             .SDL_VIDEO_VITA_PVR = false,
             .SDL_VIDEO_VITA_PVR_OGL = false,
+            .SDL_EMSCRIPTEN_PERSISTENT_PATH_STRING = null,
             // Temporarily set to a lower version as >= 1.10.0 is not yet widely available.
             // TODO: Uncomment after Ubuntu 26.04 LTS has been released?
             .SDL_XKBCOMMON_VERSION_MAJOR = if (linux_deps_values != null) @as(i64, 1) else null,

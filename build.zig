@@ -601,7 +601,12 @@ pub fn build(b: *std.Build) void {
             // TODO: Change to std.mem.cut after 0.16
             var it = std.mem.splitScalar(u8, override[2..], '=');
             const name, const value = .{ it.first(), if (it.peek() != null) it.rest() else "1" };
-            build_config_h.values.put(name, .{ .ident = value }) catch @panic("OOM");
+            if (@hasDecl(std.Build.Step.ConfigHeader, "addIdent")) {
+                build_config_h.addIdent(name, value);
+            } else {
+                // TODO: Remove after 0.16.0
+                build_config_h.values.put(name, .{ .ident = value }) catch @panic("OOM");
+            }
         } else if (std.mem.startsWith(u8, override, "-U")) {
             _ = build_config_h.values.swapRemove(override[2..]);
         } else {

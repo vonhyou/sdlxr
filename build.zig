@@ -598,15 +598,8 @@ pub fn build(b: *std.Build) void {
 
     if (build_config_h_overrides) |overrides| for (overrides) |override| {
         if (std.mem.startsWith(u8, override, "-D")) {
-            // TODO: Change to std.mem.cut after 0.16
-            var it = std.mem.splitScalar(u8, override[2..], '=');
-            const name, const value = .{ it.first(), if (it.peek() != null) it.rest() else "1" };
-            if (@hasDecl(std.Build.Step.ConfigHeader, "addIdent")) {
-                build_config_h.addIdent(name, value);
-            } else {
-                // TODO: Remove after 0.16.0
-                build_config_h.values.put(name, .{ .ident = value }) catch @panic("OOM");
-            }
+            const name, const value = std.mem.cutScalar(u8, override[2..], '=') orelse .{ override[2..], "1" };
+            build_config_h.addIdent(name, value);
         } else if (std.mem.startsWith(u8, override, "-U")) {
             _ = build_config_h.values.swapRemove(override[2..]);
         } else {
@@ -670,12 +663,6 @@ pub fn build(b: *std.Build) void {
         sdl_mod.addCMacro("_CRT_SECURE_NO_DEPRECATE", "1");
         sdl_mod.addCMacro("_CRT_NONSTDC_NO_DEPRECATE", "1");
         sdl_mod.addCMacro("_CRT_SECURE_NO_WARNINGS", "1");
-        if (@import("builtin").zig_version.major <= 15) { // TODO: Remove after 0.16
-            // Fix "duplicate symbol" errors by redefining a problematic weak symbol definition in
-            // wchar.h which was introduced in Windows SDK version 10.0.26100.0 and which LLVM 20
-            // doesn't understand how to handle.
-            sdl_mod.addCMacro("_Avx2WmemEnabledWeakValue", "_Avx2WmemEnabled");
-        }
     }
     if (emscripten and emscripten_pthreads) {
         sdl_mod.addCMacro("__EMSCRIPTEN_PTHREADS__", "1");
@@ -1120,6 +1107,7 @@ pub fn build(b: *std.Build) void {
                 "src/video/wayland/SDL_waylandmouse.c",
                 "src/video/wayland/SDL_waylandopengles.c",
                 "src/video/wayland/SDL_waylandshmbuffer.c",
+                "src/video/wayland/SDL_waylandutil.c",
                 "src/video/wayland/SDL_waylandvideo.c",
                 "src/video/wayland/SDL_waylandvulkan.c",
                 "src/video/wayland/SDL_waylandwindow.c",

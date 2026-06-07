@@ -95,23 +95,25 @@ pub fn build(b: *std.Build) void {
         },
         .macos => {
             macos = true;
-            if (b.sysroot) |sysroot| {
+            if (@hasField(std.Build, "sysroot") and b.sysroot != null) { // TODO: Remove after 0.17
+                const sysroot = b.sysroot.?;
                 system_include_path = system_include_path orelse .{ .cwd_relative = b.pathJoin(&.{ sysroot, "usr/include" }) };
                 system_framework_path = system_framework_path orelse .{ .cwd_relative = b.pathJoin(&.{ sysroot, "System/Library/Frameworks" }) };
                 library_path = library_path orelse .{ .cwd_relative = "/usr/lib" }; // ???
             }
-            if (!target.query.isNative() and (system_include_path == null or system_framework_path == null or library_path == null)) {
-                std.log.err("'--sysroot' (or '-Dsystem_include_path', '-Dsystem_framework_path' and '-Dlibrary_path') is required when building SDL for non-native macOS targets", .{});
+            if (!target.query.isNative() and !(system_include_path == null and system_framework_path == null and library_path == null)) {
+                std.log.err("'-Dsystem_include_path', '-Dsystem_framework_path' and '-Dlibrary_path' are required when building SDL for non-native macOS targets", .{});
                 std.process.exit(1);
             }
         },
         .emscripten => {
             emscripten = true;
-            if (b.sysroot) |sysroot| {
+            if (@hasField(std.Build, "sysroot") and b.sysroot != null) { // TODO: Remove after 0.17
+                const sysroot = b.sysroot.?;
                 system_include_path = system_include_path orelse .{ .cwd_relative = b.pathJoin(&.{ sysroot, "include" }) };
             }
             if (system_include_path == null) {
-                std.log.err("'--sysroot' (or '-Dsystem_include_path') is required when building SDL for Emscripten", .{});
+                std.log.err("'-Dsystem_include_path' is required when building SDL for Emscripten", .{});
                 std.process.exit(1);
             }
         },
@@ -189,7 +191,6 @@ pub fn build(b: *std.Build) void {
             .HAVE_STRTOK_R = (windows and !msvc) or linux or macos or emscripten,
             .HAVE_ITOA = windows,
             .HAVE__LTOA = windows,
-            .HAVE__UITOA = false,
             .HAVE__ULTOA = windows,
             .HAVE_STRTOL = windows or linux or macos or emscripten,
             .HAVE_STRTOUL = windows or linux or macos or emscripten,

@@ -9,7 +9,7 @@ This is a port of [SDL](https://libsdl.org/) to the Zig build system, packaged f
 
 ## Usage
 
-Requires Zig 0.15.2 or 0.16.0-dev (master).
+Requires Zig 0.16.0 or 0.17.0-dev (master).
 
 ```sh
 zig fetch --save git+https://github.com/castholm/SDL.git
@@ -90,10 +90,14 @@ Building for `aarch64/x86_64-macos` requires Xcode 14.1 or later to be installed
 > [!NOTE]
 > **Cross-compiling for macOS from Windows or Linux host systems is not supported** because [the Xcode and Apple SDKs Agreement](https://www.apple.com/legal/sla/docs/xcode.pdf) explicitly prohibits using macOS SDK files from non-Apple-branded systems.
 
-When building for non-native macOS targets (for example for x86-64 from an AArch64 Mac), you need to provide a path to the macOS SDK sysroot via `--sysroot`:
+When building for non-native macOS targets (for example for x86-64 from an AArch64 Mac), you need to explicitly provide paths to the macOS SDK header, framework and library directories:
 
 ```sh
-zig build -Dtarget=x86_64-macos --sysroot "$(xcrun --sdk macosx --show-sdk-path)"
+macos_sdk_path="$(xcrun --sdk macosx --show-sdk-path)"
+zig build -Dtarget=x86_64-macos \
+	"-Dsystem_include_path=$macos_sdk_path/usr/include" \
+	"-Dsystem_framework_path=$macos_sdk_path/System/Library/Frameworks" \
+	"-Dlibrary_path=$macos_sdk_path/usr/lib"
 ```
 
 ### Emscripten (web)
@@ -112,10 +116,10 @@ zig build -Dtarget=x86_64-macos --sysroot "$(xcrun --sdk macosx --show-sdk-path)
 
 Building for `wasm32-emscripten` requires an Emscripten development environment to be set up on the host system. It is strongly recommended that you use [the Emscripten SDK](https://emscripten.org/docs/getting_started/downloads.html) for installing and managing Emscripten.
 
-When building for Emscripten, you need to provide a path to the Emscripten sysroot via `--sysroot`:
+When building for Emscripten, you need to explicitly provide a path to the Emscripten SDK header directory:
 
 ```sh
-zig build -Dtarget=wasm32-emscripten --sysroot "$(em-config CACHE)/sysroot"
+zig build -Dtarget=wasm32-emscripten "-Dsystem_include_path=$(em-config CACHE)/sysroot/include"
 ```
 
 Depending on the state of your Emscripten cache, you might need to run `embuilder build sysroot` to ensure that the Emscripten sysroot is built before you run `zig build`.
@@ -124,7 +128,7 @@ To build with [pthreads support](https://emscripten.org/docs/porting/pthreads.ht
 
 ## Contributing
 
-Due to maintainers having limited time to test and verify that external contributions meet the appropriate quality standards, **pull requests have been disabled for this repository**. If you encounter a problem with the package, or have suggestions for improvements, please open an issue.
+Pull requests have been disabled for this repository. If you encounter a problem with the package, or have suggestions for improvements, please open an issue.
 
 ## License
 

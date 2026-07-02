@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 .{
-    .name = .sdl,
-    .version = "0.5.1+3.4.10",
-    .fingerprint = 0xec638ccbfafe3248,
+    .name = .sdlxr,
+    .version = "0.0.1+3.5.0",
+    .fingerprint = 0xd434dcfcad287f86,
     .minimum_zig_version = "0.16.0",
     .dependencies = .{
         .sdl_linux_deps = .{

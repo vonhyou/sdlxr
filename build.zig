@@ -126,6 +126,8 @@ pub fn build(b: *std.Build) void {
         else => {},
     }
 
+    const have_gpu_openxr = gpu_openxr and (windows or linux or macos);
+
     const build_config_h: *std.Build.Step.ConfigHeader = build_config_h: {
         const cpu = target.result.cpu;
         const x86 = cpu.arch.isX86();
@@ -522,7 +524,7 @@ pub fn build(b: *std.Build) void {
             .SDL_GPU_D3D12 = windows,
             .SDL_GPU_VULKAN = windows or linux or macos,
             .SDL_GPU_METAL = macos,
-            .HAVE_GPU_OPENXR = gpu_openxr and (windows or linux or macos),
+            .HAVE_GPU_OPENXR = have_gpu_openxr,
             .SDL_GPU_PRIVATE = false,
             .SDL_POWER_ANDROID = false,
             .SDL_POWER_LINUX = linux,

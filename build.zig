@@ -47,12 +47,6 @@ pub fn build(b: *std.Build) void {
         "emscripten_pthreads",
         "Build with pthreads support when targeting Emscripten (default: false)",
     ) orelse false;
-    // Undocumented "advanced" options for specialized use cases below
-    const build_config_h_overrides = b.option(
-        []const []const u8,
-        "build_config_h_overrides",
-        "Override 'SDL_build_config.h' entries (e.g. '-DHAVE_SIN=1', '-UHAVE_COS')",
-    );
     var system_include_path = b.option(
         std.Build.LazyPath,
         "system_include_path",
@@ -67,6 +61,12 @@ pub fn build(b: *std.Build) void {
         std.Build.LazyPath,
         "library_path",
         "Library search path for cross-compiling",
+    );
+    // Undocumented "advanced" options for specialized use cases below
+    const build_config_h_overrides = b.option(
+        []const []const u8,
+        "build_config_h_overrides",
+        "Override 'SDL_build_config.h' entries (e.g. '-DHAVE_SIN=1', '-UHAVE_COS')",
     );
     const install_build_config_h = b.option(
         bool,
@@ -125,6 +125,8 @@ pub fn build(b: *std.Build) void {
         },
         else => {},
     }
+
+    const have_gpu_openxr = gpu_openxr and (windows or linux or macos);
 
     const build_config_h: *std.Build.Step.ConfigHeader = build_config_h: {
         const cpu = target.result.cpu;
@@ -522,7 +524,7 @@ pub fn build(b: *std.Build) void {
             .SDL_GPU_D3D12 = windows,
             .SDL_GPU_VULKAN = windows or linux or macos,
             .SDL_GPU_METAL = macos,
-            .HAVE_GPU_OPENXR = gpu_openxr and (windows or linux or macos),
+            .HAVE_GPU_OPENXR = have_gpu_openxr,
             .SDL_GPU_PRIVATE = false,
             .SDL_POWER_ANDROID = false,
             .SDL_POWER_LINUX = linux,

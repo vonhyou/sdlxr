@@ -1805,6 +1805,7 @@ typedef struct SDL_GPUBufferCreateInfo
  *
  * \since This struct is available since SDL 3.2.0.
  *
+ * \sa SDL_GPUTransferBufferUsage
  * \sa SDL_CreateGPUTransferBuffer
  */
 typedef struct SDL_GPUTransferBufferCreateInfo
@@ -1872,6 +1873,7 @@ typedef struct SDL_GPUMultisampleState
  * \since This struct is available since SDL 3.2.0.
  *
  * \sa SDL_GPUGraphicsPipelineCreateInfo
+ * \sa SDL_GPUStencilOpState
  */
 typedef struct SDL_GPUDepthStencilState
 {
@@ -2382,6 +2384,20 @@ extern SDL_DECLSPEC SDL_GPUDevice * SDLCALL SDL_CreateGPUDeviceWithProperties(
 #define SDL_PROP_GPU_DEVICE_CREATE_VULKAN_OPTIONS_POINTER                       "SDL.gpu.device.create.vulkan.options"
 #define SDL_PROP_GPU_DEVICE_CREATE_METAL_ALLOW_MACFAMILY1_BOOLEAN               "SDL.gpu.device.create.metal.allowmacfamily1"
 
+#define SDL_PROP_GPU_DEVICE_CREATE_XR_ENABLE_BOOLEAN                            "SDL.gpu.device.create.xr.enable"
+#define SDL_PROP_GPU_DEVICE_CREATE_XR_INSTANCE_POINTER                          "SDL.gpu.device.create.xr.instance_out"
+#define SDL_PROP_GPU_DEVICE_CREATE_XR_SYSTEM_ID_POINTER                         "SDL.gpu.device.create.xr.system_id_out"
+#define SDL_PROP_GPU_DEVICE_CREATE_XR_VERSION_NUMBER                            "SDL.gpu.device.create.xr.version"
+#define SDL_PROP_GPU_DEVICE_CREATE_XR_FORM_FACTOR_NUMBER                        "SDL.gpu.device.create.xr.form_factor"
+#define SDL_PROP_GPU_DEVICE_CREATE_XR_EXTENSION_COUNT_NUMBER                    "SDL.gpu.device.create.xr.extensions.count"
+#define SDL_PROP_GPU_DEVICE_CREATE_XR_EXTENSION_NAMES_POINTER                   "SDL.gpu.device.create.xr.extensions.names"
+#define SDL_PROP_GPU_DEVICE_CREATE_XR_LAYER_COUNT_NUMBER                        "SDL.gpu.device.create.xr.layers.count"
+#define SDL_PROP_GPU_DEVICE_CREATE_XR_LAYER_NAMES_POINTER                       "SDL.gpu.device.create.xr.layers.names"
+#define SDL_PROP_GPU_DEVICE_CREATE_XR_APPLICATION_NAME_STRING                   "SDL.gpu.device.create.xr.application.name"
+#define SDL_PROP_GPU_DEVICE_CREATE_XR_APPLICATION_VERSION_NUMBER                "SDL.gpu.device.create.xr.application.version"
+#define SDL_PROP_GPU_DEVICE_CREATE_XR_ENGINE_NAME_STRING                        "SDL.gpu.device.create.xr.engine.name"
+#define SDL_PROP_GPU_DEVICE_CREATE_XR_ENGINE_VERSION_NUMBER                     "SDL.gpu.device.create.xr.engine.version"
+
 
 /**
  * A structure specifying additional options when using Vulkan.
@@ -2443,7 +2459,9 @@ extern SDL_DECLSPEC int SDLCALL SDL_GetNumGPUDrivers(void);
  * meant to be proper names.
  *
  * \param index the index of a GPU driver.
- * \returns the name of the GPU driver with the given **index**.
+ * \returns the name of the GPU driver with the given **index** or NULL when
+ *          the index is out of bounds; call SDL_GetError() for more
+ *          information.
  *
  * \since This function is available since SDL 3.2.0.
  *
@@ -3042,6 +3060,9 @@ extern SDL_DECLSPEC void SDLCALL SDL_PopGPUDebugGroup(
  *
  * You must not reference the texture after calling this function.
  *
+ * It is safe to pass NULL for `texture`, in that case this function is a
+ * no-op.
+ *
  * \param device a GPU context.
  * \param texture a texture to be destroyed.
  *
@@ -3055,6 +3076,9 @@ extern SDL_DECLSPEC void SDLCALL SDL_ReleaseGPUTexture(
  * Frees the given sampler as soon as it is safe to do so.
  *
  * You must not reference the sampler after calling this function.
+ *
+ * It is safe to pass NULL for `sampler`, in that case this function is a
+ * no-op.
  *
  * \param device a GPU context.
  * \param sampler a sampler to be destroyed.
@@ -3070,6 +3094,9 @@ extern SDL_DECLSPEC void SDLCALL SDL_ReleaseGPUSampler(
  *
  * You must not reference the buffer after calling this function.
  *
+ * It is safe to pass NULL for `buffer`, in that case this function is a
+ * no-op.
+ *
  * \param device a GPU context.
  * \param buffer a buffer to be destroyed.
  *
@@ -3083,6 +3110,9 @@ extern SDL_DECLSPEC void SDLCALL SDL_ReleaseGPUBuffer(
  * Frees the given transfer buffer as soon as it is safe to do so.
  *
  * You must not reference the transfer buffer after calling this function.
+ *
+ * It is safe to pass NULL for `transfer_buffer`, in that case this function
+ * is a no-op.
  *
  * \param device a GPU context.
  * \param transfer_buffer a transfer buffer to be destroyed.
@@ -3098,6 +3128,9 @@ extern SDL_DECLSPEC void SDLCALL SDL_ReleaseGPUTransferBuffer(
  *
  * You must not reference the compute pipeline after calling this function.
  *
+ * It is safe to pass NULL for `compute_pipeline`, in that case this function
+ * is a no-op.
+ *
  * \param device a GPU context.
  * \param compute_pipeline a compute pipeline to be destroyed.
  *
@@ -3112,6 +3145,9 @@ extern SDL_DECLSPEC void SDLCALL SDL_ReleaseGPUComputePipeline(
  *
  * You must not reference the shader after calling this function.
  *
+ * It is safe to pass NULL for `shader`, in that case this function is a
+ * no-op.
+ *
  * \param device a GPU context.
  * \param shader a shader to be destroyed.
  *
@@ -3125,6 +3161,9 @@ extern SDL_DECLSPEC void SDLCALL SDL_ReleaseGPUShader(
  * Frees the given graphics pipeline as soon as it is safe to do so.
  *
  * You must not reference the graphics pipeline after calling this function.
+ *
+ * It is safe to pass NULL for `graphics_pipeline`, in that case this function
+ * is a no-op.
  *
  * \param device a GPU context.
  * \param graphics_pipeline a graphics pipeline to be destroyed.
@@ -4216,10 +4255,13 @@ extern SDL_DECLSPEC SDL_GPUTextureFormat SDLCALL SDL_GetGPUSwapchainTextureForma
  * submitted. The swapchain texture should only be referenced by the command
  * buffer used to acquire it.
  *
- * This function will fill the swapchain texture handle with NULL if too many
- * frames are in flight. This is not an error. This NULL pointer should not be
- * passed back into SDL. Instead, it should be considered as an indication to
- * wait until the swapchain is available.
+ * If too many frames are in flight, this function will fill the swapchain
+ * texture handle with NULL and return true. This is not an error. This NULL
+ * pointer should not be passed back into SDL. Instead, it should be
+ * considered as an indication to wait.
+ *
+ * In VSYNC present mode (which is the default) this function may block on
+ * vblank.
  *
  * If you use this function, it is possible to create a situation where many
  * command buffers are allocated while the rendering context waits for the GPU
@@ -4264,7 +4306,8 @@ extern SDL_DECLSPEC bool SDLCALL SDL_AcquireGPUSwapchainTexture(
     Uint32 *swapchain_texture_height);
 
 /**
- * Blocks the thread until a swapchain texture is available to be acquired.
+ * Blocks the thread until all presenting command buffers are finished
+ * executing.
  *
  * \param device a GPU context.
  * \param window a window that has been claimed.
@@ -4465,6 +4508,8 @@ extern SDL_DECLSPEC bool SDLCALL SDL_QueryGPUFence(
  *
  * You must not reference the fence after calling this function.
  *
+ * It is safe to pass NULL for `fence`, in that case this function is a no-op.
+ *
  * \param device a GPU context.
  * \param fence a fence.
  *
@@ -4567,11 +4612,13 @@ extern SDL_DECLSPEC SDL_GPUTextureFormat SDLCALL SDL_GetGPUTextureFormatFromPixe
 #ifdef SDL_PLATFORM_GDK
 
 /**
- * Call this to suspend GPU operation on Xbox when you receive the
+ * Call this to suspend GPU operation on Xbox after receiving the
  * SDL_EVENT_DID_ENTER_BACKGROUND event.
  *
  * Do NOT call any SDL_GPU functions after calling this function! This must
  * also be called before calling SDL_GDKSuspendComplete.
+ *
+ * This function MUST be called from the application's render thread.
  *
  * \param device a GPU context.
  *
@@ -4582,11 +4629,13 @@ extern SDL_DECLSPEC SDL_GPUTextureFormat SDLCALL SDL_GetGPUTextureFormatFromPixe
 extern SDL_DECLSPEC void SDLCALL SDL_GDKSuspendGPU(SDL_GPUDevice *device);
 
 /**
- * Call this to resume GPU operation on Xbox when you receive the
+ * Call this to resume GPU operation on Xbox after receiving the
  * SDL_EVENT_WILL_ENTER_FOREGROUND event.
  *
  * When resuming, this function MUST be called before calling any other
  * SDL_GPU functions.
+ *
+ * This function MUST be called from the application's render thread.
  *
  * \param device a GPU context.
  *

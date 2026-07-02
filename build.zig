@@ -74,6 +74,12 @@ pub fn build(b: *std.Build) void {
         "Additionally install 'SDL_build_config.h' when installing SDL (default: false)",
     ) orelse false;
 
+    const gpu_openxr = b.option(
+        bool,
+        "gpu_openxr",
+        "Build SDL_GPU with OpenXR support (default: true)",
+    ) orelse true;
+
     var windows = false;
     var linux = false;
     var linux_deps_values: ?LinuxDepsValues = null;
@@ -516,6 +522,7 @@ pub fn build(b: *std.Build) void {
             .SDL_GPU_D3D12 = windows,
             .SDL_GPU_VULKAN = windows or linux or macos,
             .SDL_GPU_METAL = macos,
+            .HAVE_GPU_OPENXR = gpu_openxr and (windows or linux or macos),
             .SDL_GPU_PRIVATE = false,
             .SDL_POWER_ANDROID = false,
             .SDL_POWER_LINUX = linux,
@@ -765,6 +772,8 @@ pub fn build(b: *std.Build) void {
             "src/events/imKStoUCS.c",
             "src/filesystem/SDL_filesystem.c",
             "src/gpu/SDL_gpu.c",
+            "src/gpu/xr/SDL_gpu_openxr.c",
+            "src/gpu/xr/SDL_openxrdyn.c",
             "src/haptic/SDL_haptic.c",
             "src/hidapi/SDL_hidapi.c",
             "src/io/SDL_asyncio.c",
@@ -1115,7 +1124,6 @@ pub fn build(b: *std.Build) void {
                 "src/tray/unix/SDL_tray.c",
                 "src/core/unix/SDL_appid.c",
                 "src/core/unix/SDL_fribidi.c",
-                "src/core/unix/SDL_gtk.c",
                 "src/core/unix/SDL_libthai.c",
                 "src/core/unix/SDL_poll.c",
                 "src/camera/v4l2/SDL_camera_v4l2.c",

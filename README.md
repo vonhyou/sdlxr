@@ -25,6 +25,9 @@ const sdl_dep = b.dependency("sdl", .{
     //.pic = null,
     //.lto = null,
     //.emscripten_pthreads = false,
+    //.system_include_path = null,
+    //.system_framework_path = null,
+    //.library_path = null,
 });
 const sdl_lib = sdl_dep.artifact("SDL3");
 const sdl_test_lib = sdl_dep.artifact("SDL3_test");

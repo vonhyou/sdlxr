@@ -47,12 +47,6 @@ pub fn build(b: *std.Build) void {
         "emscripten_pthreads",
         "Build with pthreads support when targeting Emscripten (default: false)",
     ) orelse false;
-    // Undocumented "advanced" options for specialized use cases below
-    const build_config_h_overrides = b.option(
-        []const []const u8,
-        "build_config_h_overrides",
-        "Override 'SDL_build_config.h' entries (e.g. '-DHAVE_SIN=1', '-UHAVE_COS')",
-    );
     var system_include_path = b.option(
         std.Build.LazyPath,
         "system_include_path",
@@ -67,6 +61,12 @@ pub fn build(b: *std.Build) void {
         std.Build.LazyPath,
         "library_path",
         "Library search path for cross-compiling",
+    );
+    // Undocumented "advanced" options for specialized use cases below
+    const build_config_h_overrides = b.option(
+        []const []const u8,
+        "build_config_h_overrides",
+        "Override 'SDL_build_config.h' entries (e.g. '-DHAVE_SIN=1', '-UHAVE_COS')",
     );
     const install_build_config_h = b.option(
         bool,

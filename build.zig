@@ -432,7 +432,7 @@ pub fn build(b: *std.Build) void {
             .SDL_TIME_WINDOWS = windows,
             .SDL_TIME_VITA = false,
             .SDL_TIME_PSP = false,
-            .SDL_TIME_PS2 = false,
+            // .SDL_TIME_PS2 = false,
             .SDL_TIME_N3DS = false,
             .SDL_TIME_NGAGE = false,
             .SDL_TIME_PRIVATE = false,
